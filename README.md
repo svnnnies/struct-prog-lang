@@ -1,1 +1,1 @@
-# struct-prog-lang
+# struct-prog-languages
