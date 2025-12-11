@@ -6,15 +6,25 @@ from tokenizer import tokenize
 
 from parser import parse
 
-from evaluator import evaluate
+from evaluator import evaluate, set_watch
 
 def main():
     environment = {}
     
     # Check for command line arguments
-    if len(sys.argv) > 1:
+    # Parse simple keyword arguments like watch=<identifier>
+    filename = None
+    for arg in sys.argv[1:]:
+        if arg.startswith("watch="):
+            set_watch(arg.split("=",1)[1])
+        else:
+            # first non-keyword argument is treated as filename
+            if filename is None:
+                filename = arg
+
+    if filename:
         # Filename provided, read and execute it
-        with open(sys.argv[1], 'r') as f:
+        with open(filename, 'r') as f:
             source_code = f.read()
         try:
             tokens = tokenize(source_code)

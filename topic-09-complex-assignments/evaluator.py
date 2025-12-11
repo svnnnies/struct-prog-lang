@@ -3,6 +3,13 @@ from parser import parse
 from pprint import pprint
 import copy
 
+# Watch name support: set via runner when user supplies watch=<identifier>
+_watch_name = None
+
+def set_watch(name):
+    global _watch_name
+    _watch_name = name
+
 def type_of(*args):
     def single_type(x):
         if isinstance(x, bool):
@@ -523,6 +530,13 @@ def evaluate(ast, environment):
         if value_status == "exit": return value, "exit"
 
         target_base[target_index] = value
+        # If user requested a watch on an identifier, print assignments
+        try:
+            if target["tag"] == "identifier" and _watch_name is not None and target.get("value") == _watch_name:
+                loc = target.get("line", target.get("position", "?"))
+                print(f"watch: {target['value']} = {value} (line {loc})")
+        except Exception:
+            pass
         return value, None
 
     if ast["tag"] == "return":
